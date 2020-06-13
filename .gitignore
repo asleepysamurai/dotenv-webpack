@@ -16,7 +16,8 @@ docs
 .nyc_output
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-dist
+# Disable this because we are installing this from git in other projects and need dist
+# dist
 
 # Dependency directories
 node_modules
