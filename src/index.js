@@ -24,6 +24,7 @@ class Dotenv {
    * @param {Boolean|String} [options.safe=false] - If false ignore safe-mode, if true load `'./.env.example'`, if a string load that file as the sample.
    * @param {Boolean} [options.systemvars=false] - If true, load system environment variables.
    * @param {Boolean} [options.silent=false] - If true, suppress warnings, if false, display warnings.
+   * @param {Boolean} [options.unsafeAllowAllEnvVars=false] - If true, copy everything in env files, else only copy explicitly used
    * @returns {webpack.DefinePlugin}
    */
   constructor (config = {}) {
@@ -118,10 +119,10 @@ class Dotenv {
   }
 
   formatData (vars = {}) {
-    const { expand } = this.config
-    return Object.keys(vars).reduce((obj, key) => {
+    const { expand, unsafeAllowAllEnvVars } = this.config
+    const obj = Object.keys(vars).reduce((obj, key) => {
       const v = vars[key]
-      const vKey = `process.env.${key}`
+      const vKey = unsafeAllowAllEnvVars ? key : `process.env.${key}`
       let vValue
       if (expand) {
         if (v.substring(0, 2) === '\\$') {
@@ -139,6 +140,13 @@ class Dotenv {
 
       return obj
     }, {})
+
+    if(unsafeAllowAllEnvVars){
+      return {'process.env':obj}
+    }
+    else{
+      return obj
+    }
   }
 
   /**
